@@ -1,0 +1,38 @@
+# This docker-compose setup is for local development and student project testing only.
+
+services:
+  postgres-primary:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: studentpass
+      POSTGRES_DB: appdb
+    volumes:
+      - pgdata-primary:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  postgres-replica:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: studentpass
+    volumes:
+      - pgdata-replica:/var/lib/postgresql/data
+    depends_on:
+      - postgres-primary
+    ports:
+      - "5433:5432"
+
+  flask-app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      PRIMARY_DB_URL: postgresql://postgres:studentpass@postgres-primary:5432/appdb
+      REPLICA_DB_URL: postgresql://postgres:studentpass@postgres-replica:5432/appdb
+    depends_on:
+      - postgres-primary
+      - postgres-replica
+
+volumes:
+  pgdata-primary:
+  pgdata-replica:
