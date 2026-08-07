@@ -17,7 +17,7 @@ This architecture features dynamic **Read/Write DB Splitting** using **PostgreSQ
 
 ```mermaid
 flowchart TD
-    Client[📱 Client / HTTP Request]
+    Client["📱 Client / HTTP Request"]
     
     subgraph AppContainer ["🐳 Flask API Container"]
         FlaskFactory["Flask Application Factory (create_app)"]
@@ -27,25 +27,25 @@ flowchart TD
 
     subgraph PrimaryDB ["🟢 Postgres Primary (Port 5432)"]
         WriteEngine["WriteSession Engine (pool_size=5)"]
-        PrimaryData[(Primary Database: appdb)]
+        PrimaryData[("Primary Database: appdb")]
     end
 
     subgraph ReplicaDB ["🔵 Postgres Read-Replica (Port 5433)"]
         ReadEngine["ReadSession Engine (pool_size=5)"]
-        ReplicaData[(Replica Database: appdb)]
+        ReplicaData[("Replica Database: appdb")]
     end
 
-    Client -->|HTTP GET / POST / PUT / DELETE| FlaskFactory
+    Client -->|"HTTP GET / POST / PUT / DELETE"| FlaskFactory
     FlaskFactory --> Blueprints
     Blueprints --> DBRouter
     
-    DBRouter -->|Write Operations: POST, PUT, DELETE| WriteEngine
+    DBRouter -->|"Write Operations: POST, PUT, DELETE"| WriteEngine
     WriteEngine --> PrimaryData
     
-    DBRouter -->|Read Operations: GET| ReadEngine
+    DBRouter -->|"Read Operations: GET"| ReadEngine
     ReadEngine --> ReplicaData
     
-    PrimaryData -->|⚡ Streaming Replication (WAL / pg_basebackup)| ReplicaData
+    PrimaryData -->|"⚡ Streaming Replication (WAL / pg_basebackup)"| ReplicaData
 ```
 
 ---
