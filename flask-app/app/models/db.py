@@ -1,5 +1,3 @@
-# This file sets up the database connection using SQLAlchemy and defines the database models.
-
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
